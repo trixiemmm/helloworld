@@ -1,0 +1,26 @@
+I/O
+字节流：InputStream,OutputStream 字符流：Writer Reader 均为抽象类
+文字考虑字符流。
+子类名后缀是父类，前缀是功能
+。
+Writer-OutputStreamWriter-FileWriter：写入文件字符流。write方法写入到缓冲区，刷新流才真正写入文件。使用后要close。换行用\r\n（结合system.getproperty）。
+默认是从头开始写，续写要在构造时指定方式（后加true）
+
+I/O异常处理：资源关闭。由于不同封闭块不相认，所以在try前new FileWriter =null，在try中赋值，finally中的close要另try还要判断fw是否为null。
+Reader-InputStreamReader-FileReader：读出文件字符流。文件必须存在。读字符最后是-1。对于读取字符数组，比如文件中abcde，用char[3]读，第二次可能是de，只读两个字符，打印为dec（c来自上一次打印），打印时构造new String截取0到num，其中num为读取的返回值，意思是读了多少个字符。
+
+BufferdWriter：用于提供Writer的效率，所以构造函数要传入一个Writer。Writer被关，BuffedWriter也被关。唯一有newLine方法的流。循环写入时每个循环最好都flush
+
+BuffedReader：用于提供Reader的效率，所以构造函数要传入一个Reader。行以回车为限。重写读单个字符的read，从缓冲区读。readLine基于read，在内存中不读取\R，读到即停止。所以一行行赋值文件要手动newline。
+
+InputOutputStreamWR 构造都用stream
+
+File：path是构造时候些什么路径就什么路径，abspath就是绝对路径。FileCreater文件存在就不创建，而非更新。delete只能删空目录，不走回收站。mkdir是创建单目录，mkdirs多目录。当File a\\b\\c 此时delete只删c。
+当文件不存在时，用ISFILE和ISDIRECTORY都是false。renameto是剪切并重命名。list方法如果用在系统级目录或文件上会异常。listfiles能拿到所有目录对象，用来过滤隐藏文件。用filefilter而非filenamefileter作为接口。
+Properties：如果修改时输出流和写入流（前后）挨在一起容易出问题，因为file对象被后一个新建，并清空，此时load方法读入了一片空白。
+PrintStream的print（97）打出97，而write写为a
+ObjectInputStream读出对象要有class文件，不然会失败。
+ByteI/OStream：关闭方法是摆设，因为只操作内存，不利用操作系统操作资源。不抛出IOException。常见的应用：比如，我们的程序需要将一台计算机的屏幕图像通过网络不断地传送到另外的计算机上，为了节省网络带宽，我们需要将一副屏幕图像进行压缩后，在通过网络发送出去。如果没有内存虚拟文件，我们需要将一台计算机的屏幕图像的像素数据写入到硬盘上的临时文件，再以这个文件作为输入流对象去调用那个压缩函数，接着又从压缩函数生成的压缩文件中读取压缩后的数据，在通过网络发送出去，最后删除压缩前后生成的两个临时文件。这个效率非常低。
+编码：String默认平台码表。String是字符本身，要getbyte才能从相应的码表获取字节值。多余的转换有时候还是很有用的，比如ftp协议只支持ISO-8859-1编码，这个时候如果要传中文，只能先换成ISO-8859-1的乱码，ftp完成后，再转回UTF-8就又可以得到正常的中文了。
+“由于UTF-8的特殊编码方式，所以有些序列是不可能出现在UTF-8编码中的”，所以当我们将由GBK编码的12个字节试图用UTF-8解码时会出现错误，由于GBK编码出了不可能出现在UTF-8编码中出现的序列，所以当我们试图用UTF-8去解码时，经常会遇到这种不可能序列，对于这种不可能序列，UTF-8把它们转换成某种不可言喻的字符“�”，当这种不可言喻的字符再次以UTF-8进行编码时，他们已经无法回到最初的样子了，因为那些是UTF-8编码不可能编出的序列。然后这个神秘字符再转换成GBK编码时就变成了“锟斤拷”。当然，还有很多其他的巧合，可能正好碰到UTF-8中存在的序列，甚至原本不是一个字符的字节，可能是某个字的第二个字节和下一个字的两个字节，正好被识别成一个UTF-8序列，于是解码出一个汉字，当然这些在我们看来都是乱码了，只不过不是“锟斤拷”的样子。因为不可能序列更普遍存在，所以GBK转UTF-8再转GBK时，最常见的便是“锟斤拷”！
+ANSI码仅在前126个与ASCII码相同。在简体中文Windows操作系统中，ANSI 编码代表 GBK 编码；在英文Windows操作系统中，ANSI 编码代表 ASCII编码；在繁体中文Windows操作系统中，ANSI编码代表Big5；在日文Windows操作系统中，ANSI 编码代表 Shift_JIS 编码。而“联通”二字复合utf8的编码顺序，致使记事本默认的ansi被误认为unicode解码。
