@@ -1,0 +1,7 @@
+reflect包
+newinstance（）调用空参构造函数，若无空参构造函数使用getconstructor（公共）、getdeclaredconstructor（所有）获取所有参数的构造函数
+getfield的参数不是变量类型而是变量名，field的accuccessful会去掉get方法的访问限制。
+getmethod除了参数还要拿函数名。
+获取新对象可以用Class类或者constructor类的newinstance，后者可以传构造函数。
+
+
